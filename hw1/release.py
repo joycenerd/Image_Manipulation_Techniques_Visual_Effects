@@ -9,11 +9,12 @@ import argparse
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--name',type=str,help='image name')
+parser.add_argument('--k',type=int,help='k nearest neighbors k')
 args=parser.parse_args()
 
 
 
-def knn_matting(image, trimap, my_lambda=100):
+def knn_matting(image, trimap, k,my_lambda=100):
     [h, w, c] = image.shape
     image, trimap = image / 255.0, trimap / 255.0
     foreground = (trimap == 1.0).astype(int)
@@ -33,7 +34,7 @@ def knn_matting(image, trimap, my_lambda=100):
     feat_vec=np.append(feat_1,feat_2,axis=0).T
 
     # find k nearest neighbors
-    model=sklearn.neighbors.NearestNeighbors(n_neighbors=10,n_jobs=3)
+    model=sklearn.neighbors.NearestNeighbors(n_neighbors=k,n_jobs=4)
     model.fit(feat_vec)
     knn=model.kneighbors(feat_vec)[1]
 
@@ -42,8 +43,8 @@ def knn_matting(image, trimap, my_lambda=100):
     #       and all other stuff needed
     ####################################################
     # get affinity matrix A
-    row_idx=np.repeat(all_pixs,10)
-    col_idx=knn.reshape(h*w*10)
+    row_idx=np.repeat(all_pixs,k)
+    col_idx=knn.reshape(h*w*k)
     kernel=1-np.linalg.norm(feat_vec[row_idx]-feat_vec[col_idx],axis=1)/(c+2)
     A=scipy.sparse.coo_matrix((kernel,(row_idx,col_idx)),shape=(h*w,h*w))
     
@@ -71,10 +72,10 @@ def knn_matting(image, trimap, my_lambda=100):
     alpha = []
     try:
         sol=scipy.sparse.linalg.spsolve(first,second)
-        alpha=np.minimum(np.maximum(sol,0),1).reshape(h,w)
+        alpha=np.clip(sol,0,1).reshape(h,w)
     except Warning:
         sol=scipy.sparse.linalg.lsqr(first,second)[0]
-        alpha=np.minimum(np.maximum(sol,0),1).reshape(h,w)
+        alpha=np.clip(sol,0,1).reshape(h,w)
 
     return alpha
 
@@ -83,9 +84,9 @@ if __name__ == '__main__':
 
     image = cv2.imread(f'./image/{args.name}.png')
     trimap = cv2.imread(f'./trimap/{args.name}.png', cv2.IMREAD_GRAYSCALE)
-    background=cv2.imread(f'./background/{args.name}_2.png')
+    background=cv2.imread(f'./background/{args.name}.png')
 
-    alpha = knn_matting(image, trimap)
+    alpha = knn_matting(image, trimap,args.k)
     alpha = alpha[:, :, np.newaxis]
 
     ####################################################
@@ -99,4 +100,4 @@ if __name__ == '__main__':
     result = []
     alpha_3d=np.repeat(alpha,repeats=3,axis=2)
     result=alpha*image+(1-alpha)*background
-    cv2.imwrite(f'./result/{args.name}_2.png', result)
+    cv2.imwrite(f'./result/{args.name}.png', result)
