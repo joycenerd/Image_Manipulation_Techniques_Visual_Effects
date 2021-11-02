@@ -5,6 +5,11 @@ import warnings
 import matplotlib.pyplot as plt
 import cv2
 import argparse
+import time
+from sklearn.utils.validation import check_array
+from scipy.spatial.distance import pdist,squareform
+import scipy
+import os
 
 
 parser=argparse.ArgumentParser()
@@ -13,8 +18,30 @@ parser.add_argument('--k',type=int,help='k nearest neighbors k')
 args=parser.parse_args()
 
 
+def get_gauss_kernel(X,row_idx,col_idx,sigma=1.0):
+    """Calculate kernel matrix between X and X.
 
-def knn_matting(image, trimap, k,my_lambda=100):
+    Parameters
+    ----------
+    X: np.ndarray
+        data matrix with [n_samples, n_features]
+
+    sigma: float, optional (default=1.0)
+        the width in gaussian kernel.
+
+    check_arr: bool, optional (default=True)
+        whether to check the given feature matrix.
+
+    Returns
+    -------
+    K: np.ndarray
+        Kernel matrix between X and X.
+    """
+    
+
+
+
+def knn_matting(image, trimap, k,my_lambda=100,sigma=2,k_method='one_norm'):
     [h, w, c] = image.shape
     image, trimap = image / 255.0, trimap / 255.0
     foreground = (trimap == 1.0).astype(int)
@@ -45,7 +72,11 @@ def knn_matting(image, trimap, k,my_lambda=100):
     # get affinity matrix A
     row_idx=np.repeat(all_pixs,k)
     col_idx=knn.reshape(h*w*k)
-    kernel=1-np.linalg.norm(feat_vec[row_idx]-feat_vec[col_idx],axis=1)/(c+2)
+    if k_method=='one_norm':
+        kernel=1-np.linalg.norm(feat_vec[row_idx]-feat_vec[col_idx],axis=1)/(c+2)
+    elif k_method=='gaussian':
+        kernel=np.exp(-(feat_vec[row_idx]-feat_vec[col_idx])**2/sigma**2)
+        kernel=np.sum(kernel,axis=1)/(c+2)
     A=scipy.sparse.coo_matrix((kernel,(row_idx,col_idx)),shape=(h*w,h*w))
     
     # get diagonal matrix D and L
@@ -81,10 +112,13 @@ def knn_matting(image, trimap, k,my_lambda=100):
 
 
 if __name__ == '__main__':
-
+    start_time=time.time()
     image = cv2.imread(f'./image/{args.name}.png')
     trimap = cv2.imread(f'./trimap/{args.name}.png', cv2.IMREAD_GRAYSCALE)
     background=cv2.imread(f'./background/{args.name}.png')
+    result_dir='./result'
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
 
     alpha = knn_matting(image, trimap,args.k)
     alpha = alpha[:, :, np.newaxis]
@@ -100,4 +134,5 @@ if __name__ == '__main__':
     result = []
     alpha_3d=np.repeat(alpha,repeats=3,axis=2)
     result=alpha*image+(1-alpha)*background
-    cv2.imwrite(f'./result/{args.name}.png', result)
+    cv2.imwrite(f'{result_dir}/{args.name}.png', result)
+    print("--- %s seconds ---" % (time.time() - start_time))
