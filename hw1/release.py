@@ -18,29 +18,6 @@ parser.add_argument('--k',type=int,help='k nearest neighbors k')
 args=parser.parse_args()
 
 
-def get_gauss_kernel(X,row_idx,col_idx,sigma=1.0):
-    """Calculate kernel matrix between X and X.
-
-    Parameters
-    ----------
-    X: np.ndarray
-        data matrix with [n_samples, n_features]
-
-    sigma: float, optional (default=1.0)
-        the width in gaussian kernel.
-
-    check_arr: bool, optional (default=True)
-        whether to check the given feature matrix.
-
-    Returns
-    -------
-    K: np.ndarray
-        Kernel matrix between X and X.
-    """
-    
-
-
-
 def knn_matting(image, trimap, k,my_lambda=100,sigma=2,k_method='one_norm'):
     [h, w, c] = image.shape
     image, trimap = image / 255.0, trimap / 255.0
