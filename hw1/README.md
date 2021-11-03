@@ -53,3 +53,8 @@ python release.py --name winnie --k 100
 
 The results will be generated in `result/` with the name same as `--name` parameter.
 
+## GitHub Acknowledgement
+
+ We thank the authors of these repositories:
+ * [knn-matting](https://github.com/MarcoForte/knn-matting)
+ 
