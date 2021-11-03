@@ -1,6 +1,7 @@
 # KNN Matting
 
-by Zhi-Yi Chin
+### [Report](./REPORT.pdf)
+by [Zhi-Yi Chin](https://joycenerd.github.io/)
 
 Our goal is to apply [KNN matting](https://dingzeyu.li/files/knn-matting-cvpr2012.pdf) to do image composition. We use KNN matting to get the α value from the original image with a corresponding trimap; we extract the foreground from the original image and paste it to a new background. The α value decides the pixel weight of the composite image.
 
