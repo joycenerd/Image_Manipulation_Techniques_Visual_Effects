@@ -20,10 +20,11 @@ import os
 
 
 parser=argparse.ArgumentParser()
-parser.add_argument('--dataroot',type=str,default='/eva_data/zchin/facades',help='dir to save the data')
-parser.add_argument('--logdir',type=str,default='/eva_data/zchin/imvfx_hw2/pix2pix',help='logging information save dir')
+parser.add_argument('--dataroot',type=str,default='/eva_data/zchin/cityscapes',help='dir to save the data')
+parser.add_argument('--logdir',type=str,default='/eva_data/zchin/imvfx_hw2/pix2pix_cityscapes',help='logging information save dir')
 parser.add_argument('--device',type=str,default='cuda:0',help='gpu device')
 parser.add_argument('--epochs',type=int,default=100,help='number of epochs to train')
+parser.add_argument('--bs',type=int,default=1,help='batch size for training')
 parser.add_argument('--mode',type=str,default='train',help='train or test')
 args=parser.parse_args()
 
@@ -100,7 +101,7 @@ def data_loader():
     # Create the validation dataset
     val_dataset = CustomDataset(dataroot, subfolder='val', transform=transform)
     # Create the validation dataloader
-    val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=workers)
+    val_dataloader = DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=workers)
     
     return train_dataloader,val_dataloader
 
@@ -519,7 +520,7 @@ if __name__=='__main__':
     # Set random seed for reproducibility
     same_seeds(123)
 
-    img_path = os.path.join(args.dataroot,'train/1.jpg')
+    img_path = os.path.join(args.dataroot,'train/2.jpg')
     sample_image = Image.open(img_path)
     # Each original image is of size 512 x 256 containing two 256 x 256 images:
     print(sample_image.size)
@@ -532,10 +533,10 @@ if __name__=='__main__':
     dataroot = args.dataroot
 
     # Number of workers for dataloader
-    workers = 4
+    workers = 3
 
     # Batch size during training
-    batch_size = 1
+    batch_size = args.bs
 
     # The size of images 
     image_size = 256
