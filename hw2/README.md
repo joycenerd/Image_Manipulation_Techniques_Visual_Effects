@@ -35,7 +35,7 @@ You don't need to download this explicitly. In [cgan.py](./cgan.py), `torchvisio
 You can download the facades dataset via this Google drive link: [facades.zip](https://drive.google.com/file/d/1UqbM-upR2HOMauj0m6E4ci7aV3jvaOC1/view?usp=sharing)
 
 ### Cityscapes for pix2pix
-You can download the cityscapes dataset via this link: [cityscapes.tar.gz](http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/cityscapes.tar.gz)
+You can download the cityscapes dataset by following the website link: [pix2pix/datasets](http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/)
 
 You will need to pre-process the cityscapes dataset because this dataset doesn't have its own validation set. We split the whole training set into 80% for training and 20% for validation.
 
