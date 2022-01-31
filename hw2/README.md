@@ -1,4 +1,4 @@
-# KNN Matting
+# Conditional GAN Practice
 
 ### [Report](./docs/REPORT.pdf)
 by [Zhi-Yi Chin](https://joycenerd.github.io/)

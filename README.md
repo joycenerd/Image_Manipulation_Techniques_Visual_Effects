@@ -5,3 +5,8 @@ This repository is the implementation of the homework for ILE5069 Image Manipula
 Apply KNN matting to do image composition.
 
 [:page_facing_up: [Report](./hw1/REPORT.pdf)][:computer: [Code](./hw1)]
+
+## Conditional GAN Practice
+Apply three conditional GANs: cGAN, Pix2Pix, and Self-attention GAN.
+
+[:page_facing_up: [Report](./hw2/REPORT.pdf)][:computer: [Code](./hw2)]
